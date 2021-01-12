@@ -102,8 +102,6 @@ for tt = 2:length(time)-delay_sinr
     % It is also refreshed the bitrate
     user_throughput = user_throughput + new_DRC_prime; 
 end
-pcolor(users_scheduled);
-colorbar;
 %% Calculate the fairness and throughput
 
 % Throughput

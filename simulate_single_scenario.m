@@ -1,9 +1,9 @@
-clear;
-% Variable declaration: definition of the environment
-% Definition of the channel
+function [throughput, allocation_fairness, rate_fairness, ...
+    users_scheduled, time, frequency] = simulate_single_scenario(speed,f,...
+    number_users, delay_sinr, alpha, beta)
+% Function that generates a single scneario with all the given parameters
+%% Global parameters
 number_objects = 10;                    % Number of objects
-speed = 3;                              % Speed of the user(km/h)
-f = 5e9;                                % Frequency (GHz)
 c = 3e8;                                % Speed of light
 maximum_distance = 10;                  % The maximum delay comes from 10 m
 % Definition of time and frequency axes
@@ -12,7 +12,6 @@ evaluation_time = 30;                   % (s)
 subband_bw = 640e3;                     % (Hz)
 number_subbands = 114;
 % Definition of the envirnment
-number_users = 30;
 max_distance = 1000;                    % (m) max distance to base station
 % Definition of the station parameters
 tx_power = 44;                          % Maximum transmitted power (dBm)
@@ -22,14 +21,15 @@ rx_noise_figure = 9;                    % (dB)
 thermal_noise = -174;                   % (dBm/Hz): kt
 Interference = 20;                      % dB
 % Definition of the simulation parameters
-delay_sinr = 2;                         % Frames delay of the sinr
 Nt = 100;                               % Frames to evaluate the assigned resources
-alpha = 0;
-beta = 1;
 
+%%
 % Create all the parameters of each user:
-% Distance to the base terminal
-% Achievable bit-rate at each instant
+% -Distance to the base terminal
+% -Achievable bit-rate at each instant
+% -User parameters initialization such as Rm or DRC_Prime, defined in the
+%       paper
+
 users = [];
 for ii = 1:number_users
     % Each user is at a given distance
@@ -102,13 +102,10 @@ for tt = 2:length(time)-delay_sinr
     % It is also refreshed the bitrate
     user_throughput = user_throughput + new_DRC_prime; 
 end
-pcolor(users_scheduled);
-colorbar;
 %% Calculate the fairness and throughput
 
 % Throughput
 throughput = sum(user_throughput) / evaluation_time;
-fprintf('Throughput = % f Mbps\n', throughput/1e6);
 
 % Allocation fairness
 users_edges = (0:number_users)+0.5;  % Users edges to be casified in the histogram
@@ -117,17 +114,11 @@ resource_assigned_user = histcounts(users_scheduled, users_edges);
 numerator_allocation_fairness = sum(resource_assigned_user)^2;
 denominator_allocation_fairness = number_users * sum(resource_assigned_user.^2);
 allocation_fairness = numerator_allocation_fairness/denominator_allocation_fairness;
-fprintf('Allocation fariness = % f\n', allocation_fairness);
 
 % Data rate fairness
 numerator_rate_fairness = throughput^2;
 denominator_rate_fairness = number_users * sum((user_throughput/evaluation_time).^2);
 rate_fairness = numerator_rate_fairness / denominator_rate_fairness;
-fprintf('Data-rate fariness = % f\n', rate_fairness);
 
-
-
-
-
-
+end
 

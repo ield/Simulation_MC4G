@@ -25,7 +25,7 @@ f_dopler_max = f*(c+speed)/c - f;           % Dopler frequency (Hz)
     % greater than f_dopler. That is why the vector is then trucated
 f_dopler_distribution = makedist('Normal','mu',0,'sigma',f_dopler_max);
 f_dopler_distribution = truncate(f_dopler_distribution, ...
-    round(-f_dopler_max), round(f_dopler_max));
+    floor(-abs(f_dopler_max)), ceil(abs(f_dopler_max)));
 f_dopler = random(f_dopler_distribution,size(A));
 
 % Delays 
@@ -34,7 +34,7 @@ delay = delay_maximum_distance*rand(size(A));
 
 % Phases
 % The phase will be random between -180 and 180
-phase = 360*rand(size(A))-180;
+phase = 2*pi*rand(size(A))-pi;
 
 % Axes
 time = 0:time_frame:evaluation_time;
